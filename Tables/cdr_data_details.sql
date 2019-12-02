@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS `cdr_data_details` (
   `CAUSE_FOR_CLOSING` int(11) NOT NULL,
   `SERVING_NODE_IPADDR` varchar(200) NOT NULL,
   `RAT_TYPE` int(11) NOT NULL,
-  `SERVICE_DATA_FLOW_ID` varchar(100) NOT NULL,
   `PGW_ADDRESS` varchar(50) NOT NULL,
   `APN_ID` varchar(128) NOT NULL,
   `SERVED_PDP_ADDRESS` varchar(50) NOT NULL,
@@ -30,8 +29,9 @@ CREATE TABLE IF NOT EXISTS `cdr_data_details` (
   `DOWNLINK_BYTES` bigint(20) NOT NULL,
   `UPLINK_BYTES` bigint(20) NOT NULL,
   `TOTAL_BYTES` bigint(20) NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`ID`),
+  KEY `SERVED_IMSI` (`SERVED_IMSI`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is used for storing the cdr data records of the IMSI ';
 
 -- Data exporting was unselected.
 

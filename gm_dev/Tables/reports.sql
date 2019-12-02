@@ -14,12 +14,12 @@
 -- Dumping structure for table reports
 DROP TABLE IF EXISTS `reports`;
 CREATE TABLE IF NOT EXISTS `reports` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(256) NOT NULL DEFAULT '0' COMMENT 'reports names',
-  `interval_value` int(11) NOT NULL DEFAULT '0' COMMENT 'Frequency  value ',
-  `interval_unit` varchar(50) NOT NULL DEFAULT '0' COMMENT 'Frequency  type',
-  `remarks` varchar(256) NOT NULL DEFAULT '0' COMMENT 'description',
-  PRIMARY KEY (`id`)
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NAME` varchar(256) NOT NULL DEFAULT '0' COMMENT 'reports names',
+  `INTERVAL_VALUE` int(11) NOT NULL DEFAULT '0' COMMENT 'Frequency  value ',
+  `INTERVAL_UNIT` varchar(50) NOT NULL DEFAULT '0' COMMENT 'Frequency  type',
+  `REMARKS` varchar(256) NOT NULL DEFAULT '0' COMMENT 'description',
+  PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='contains details about the reports';
 
 -- Data exporting was unselected.

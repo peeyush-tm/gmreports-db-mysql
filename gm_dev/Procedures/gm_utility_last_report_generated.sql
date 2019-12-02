@@ -18,6 +18,20 @@ CREATE  PROCEDURE `gm_utility_last_report_generated`(
 	IN `in_report_type` VARCHAR(50),
 	IN `in_report_date` varchar(50)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 )
     COMMENT 'return the date of last report generated '
 BEGIN
@@ -26,29 +40,38 @@ BEGIN
   -- Author: Parul Shrivastava
   -- Date: Nov 1, 2019
   
-  -- Description: Utility returns the last executed process report 
+  -- Description: Utility returns the last executed process report date
   -- **********************************************************************
 
-	DECLARE last_sanity_date varchar(255);
+	-- Declaring the variables 
    DECLARE last_execution_date varchar(255);
-   
-	SET last_sanity_date= (SELECT data_processing_date FROM report_data_details where data_node =in_report_type  LIMIT 1);
-	SET last_execution_date = (SELECT last_execution_time FROM report_genration_details where report_id = 1  LIMIT 1);
-    
-	IF(last_execution_date <= last_sanity_date)
-	THEN 
-	SELECT max(last_execution_time) as Last_Report_date
-	FROM 
-	report_genration_details
-	INNER JOIN report_data_details 
-	ON (report_data_details.id = report_genration_details.report_id)
-	WHERE report_data_details.data_node =  in_report_type
-    AND report_data_details.is_processed = 1
-	GROUP BY (report_id);
-    ELSE
-		select "wrong date selection ";
-    END IF;
 
+	-- Set the variables for the check the data 
+	SET @report_id = (SELECT reports.ID FROM reports WHERE NAME = in_report_type limit 1);
+   set @temp_node_id = (select GROUP_CONCAT(NODE_ID) from report_mapping where REPORT_ID = @report_id  );
+	SET last_execution_date = (SELECT LAST_EXECUTION_TIME FROM report_generation_details WHERE REPORT_ID = @report_id  LIMIT 1);							
+	
+	-- select last_sanity_date,last_execution_date ,@report_id;
+	SET @count_mapping_id = (select COUNT(NODE_ID) from report_mapping 
+  								where REPORT_ID = @report_id  );
+  								
+	-- select @temp_node_id, @COUNT_ID;
+	-- checking the last snity date for the last execution date o fthe report   
+	SET @count_report_id = (SELECT COUNT(ID)  FROM report_data_details
+						WHERE FIND_IN_SET(ID,@temp_node_id) 
+						and DATA_PROCESSING_DATE >= DATE(last_execution_date)
+						AND  IS_PROCESSED = 1 );
+	
+	  -- check the condition for the sanity last update report of the data 
+	IF(@count_mapping_id = @count_report_id )
+	THEN 
+		SELECT LAST_EXECUTION_TIME 
+		FROM report_generation_details 
+		WHERE REPORT_ID = @report_id  LIMIT 1;
+	ELSE 
+		SELECT 'Data is not available for this report';
+	
+	END IF;
 
 END//
 DELIMITER ;

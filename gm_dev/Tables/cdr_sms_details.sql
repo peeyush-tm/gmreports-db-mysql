@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `cdr_sms_details` (
   KEY `DESTINATION` (`DESTINATION`(255)),
   KEY `ID` (`ID`),
   KEY `FINAL_TIME` (`FINAL_TIME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is used for storing the sms cdr records of the IMSI ';
 
 -- Data exporting was unselected.
 

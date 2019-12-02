@@ -11,27 +11,17 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table cdr_sms_details
-DROP TABLE IF EXISTS `cdr_sms_details`;
-CREATE TABLE IF NOT EXISTS `cdr_sms_details` (
+-- Dumping structure for table apn_billing_cycle_aggregation
+DROP TABLE IF EXISTS `apn_billing_cycle_aggregation`;
+CREATE TABLE IF NOT EXISTS `apn_billing_cycle_aggregation` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `SMS_TYPE` varchar(256) DEFAULT NULL,
-  `SOURCE` varchar(256) DEFAULT NULL,
-  `DESTINATION` varchar(256) DEFAULT NULL,
-  `SENT_TIME` datetime DEFAULT NULL,
-  `FINAL_TIME` datetime DEFAULT NULL,
-  `SMS_STATUS` varchar(256) DEFAULT NULL,
-  `ATTEMPTS` bigint(20) DEFAULT NULL,
-  `REASON` varchar(256) DEFAULT NULL,
-  `ORIGINATION_GT` varchar(256) DEFAULT NULL,
-  `DESTINATION_GT` varchar(256) DEFAULT NULL,
-  `SUBSCRIBER_IMSI` varchar(256) DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `SOURCE` (`SOURCE`(255)),
-  KEY `DESTINATION` (`DESTINATION`(255)),
-  KEY `ID` (`ID`),
-  KEY `FINAL_TIME` (`FINAL_TIME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is used for storing the sms cdr records of the IMSI ';
+  `APN` varchar(100) DEFAULT NULL,
+  `SERVED_IMSI` varchar(100) DEFAULT NULL,
+  `FLOW_ID` varchar(100) DEFAULT NULL,
+  `DATA_USAGE` varchar(100) DEFAULT NULL,
+  `CREATE_DATE` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='apn billing cycle table is used  to  store the data of the aggregated table ';
 
 -- Data exporting was unselected.
 

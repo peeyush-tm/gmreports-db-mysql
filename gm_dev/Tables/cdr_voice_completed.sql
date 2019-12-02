@@ -14,6 +14,8 @@
 -- Dumping structure for table cdr_voice_completed
 DROP TABLE IF EXISTS `cdr_voice_completed`;
 CREATE TABLE IF NOT EXISTS `cdr_voice_completed` (
+  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `CALLID` varchar(50) DEFAULT '0',
   `EVENTSRECD` bigint(20) DEFAULT NULL,
   `IAMRECDAT` datetime DEFAULT NULL,
   `ANMRECDAT` datetime DEFAULT NULL,
@@ -26,7 +28,8 @@ CREATE TABLE IF NOT EXISTS `cdr_voice_completed` (
   `MNC` varchar(256) DEFAULT NULL,
   `CAUSEINDCAUSEVALUE` bigint(20) DEFAULT NULL,
   `CELLID` varchar(256) DEFAULT NULL,
-  `CALLDURATION` bigint(20) DEFAULT NULL
+  `CALLDURATION` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.

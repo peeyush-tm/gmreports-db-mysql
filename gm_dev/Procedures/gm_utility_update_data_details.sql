@@ -15,8 +15,12 @@
 DROP PROCEDURE IF EXISTS `gm_utility_update_data_details`;
 DELIMITER //
 CREATE  PROCEDURE `gm_utility_update_data_details`(
-IN `in_data_node` varchar(100),
-IN `in_isprocess_value` int(10))
+	IN `in_data_node` varchar(100),
+	IN `in_isprocess_value` int(10)
+
+
+
+)
 BEGIN
   -- **********************************************************************
   -- Procedure: gm_utility_update_data_details
@@ -26,19 +30,21 @@ BEGIN
   -- Description: Utility to update the data_details values according to filters 
   -- **********************************************************************
 	
+   -- update the table last process data date into the table 
     IF (in_data_node = 'SMS')
     THEN
-		update report_data_details
-		set data_processing_date =current_timestamp,
-		is_processed = in_isprocess_value
-		where data_node = 'SMS(Delivered)'
-		or data_node = 'SMS(Undelivered)'
+		UPDATE report_data_details
+		SET DATA_PROCESSING_DATE =current_timestamp,
+		IS_PROCESSED = in_isprocess_value
+		WHERE DATA_NODE = 'SMS(Delivered)'
+		OR DATA_NODE = 'SMS(Undelivered)'
 		;
-    else
-		update report_data_details
-		set data_processing_date =current_timestamp(),
-		is_processed = in_isprocess_value
-		where data_node = in_data_node;
+    ELSE
+		-- update the table last process data date into the table 
+		UPDATE report_data_details
+		SET DATA_PROCESSING_DATE = current_timestamp(),
+		IS_PROCESSED = in_isprocess_value
+		where DATA_NODE = in_data_node;
     
     END IF;
     

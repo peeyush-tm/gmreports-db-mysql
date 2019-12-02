@@ -11,18 +11,26 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table reports
-DROP TABLE IF EXISTS `reports`;
-CREATE TABLE IF NOT EXISTS `reports` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `NAME` varchar(256) NOT NULL DEFAULT '0' COMMENT 'reports names',
-  `INTERVAL_VALUE` int(11) NOT NULL DEFAULT '0' COMMENT 'Frequency  value ',
-  `INTERVAL_UNIT` varchar(50) NOT NULL DEFAULT '0' COMMENT 'Frequency  type',
-  `REMARKS` varchar(256) NOT NULL DEFAULT '0' COMMENT 'description',
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='contains details about the reports';
+-- Dumping structure for event gm_reports.apn_details_aggregation
+DROP EVENT IF EXISTS `apn_details_aggregation`;
+DELIMITER //
+CREATE  EVENT `apn_details_aggregation` ON SCHEDULE EVERY 1 DAY STARTS '2019-11-26 23:59:59' ON COMPLETION NOT PRESERVE ENABLE COMMENT 'apn_details_aggregation' DO BEGIN
+-- **********************************************************************
+  -- Procedure: apn_details_aggregation
+  -- Author: Parul Shrivastava
+  -- Date: Nov 1, 2019
+   
+  -- Description: Event is used to generat the aggregation on daily
+  --  basis interval  
+  -- **********************************************************************
 
--- Data exporting was unselected.
+	-- call the utility to generate the data monthly 
+   CALL `gm_utility_apn_aggregation_monthly`(CURRENT_DATE());
+
+ 	
+	
+END//
+DELIMITER ;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

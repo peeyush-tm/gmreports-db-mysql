@@ -11,419 +11,107 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table .cdr_data_details
-DROP TABLE IF EXISTS `cdr_data_details`;
-CREATE TABLE IF NOT EXISTS `cdr_data_details` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `SERVED_IMSI` varchar(20) NOT NULL,
-  `RECORD_OPENING_TIME` datetime NOT NULL,
-  `DURATION_SEC` int(11) NOT NULL,
-  `CAUSE_FOR_CLOSING` int(11) NOT NULL,
-  `SERVING_NODE_IPADDR` varchar(200) NOT NULL,
-  `RAT_TYPE` int(11) NOT NULL,
-  `SERVICE_DATA_FLOW_ID` varchar(100) NOT NULL,
-  `PGW_ADDRESS` varchar(50) NOT NULL,
-  `APN_ID` varchar(128) NOT NULL,
-  `SERVED_PDP_ADDRESS` varchar(50) NOT NULL,
-  `START_TIME` datetime NOT NULL,
-  `STOP_TIME` datetime NOT NULL,
-  `DOWNLINK_BYTES` bigint(20) NOT NULL,
-  `UPLINK_BYTES` bigint(20) NOT NULL,
-  `TOTAL_BYTES` bigint(20) NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Data exporting was unselected.
-
--- Dumping structure for table .cdr_sms_details
-DROP TABLE IF EXISTS `cdr_sms_details`;
-CREATE TABLE IF NOT EXISTS `cdr_sms_details` (
-  `ID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `SMS_TYPE` varchar(256) DEFAULT NULL,
-  `SOURCE` varchar(256) DEFAULT NULL,
-  `DESTINATION` varchar(256) DEFAULT NULL,
-  `SENT_TIME` datetime DEFAULT NULL,
-  `FINAL_TIME` datetime DEFAULT NULL,
-  `SMS_STATUS` varchar(256) DEFAULT NULL,
-  `ATTEMPTS` bigint(20) DEFAULT NULL,
-  `REASON` varchar(256) DEFAULT NULL,
-  `ORIGINATION_GT` varchar(256) DEFAULT NULL,
-  `DESTINATION_GT` varchar(256) DEFAULT NULL,
-  `SUBSCRIBER_IMSI` varchar(256) DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `SOURCE` (`SOURCE`(255)),
-  KEY `DESTINATION` (`DESTINATION`(255)),
-  KEY `ID` (`ID`),
-  KEY `FINAL_TIME` (`FINAL_TIME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Data exporting was unselected.
-
--- Dumping structure for table .cdr_voice_completed
-DROP TABLE IF EXISTS `cdr_voice_completed`;
-CREATE TABLE IF NOT EXISTS `cdr_voice_completed` (
-  `EVENTSRECD` bigint(20) DEFAULT NULL,
-  `IAMRECDAT` datetime DEFAULT NULL,
-  `ANMRECDAT` datetime DEFAULT NULL,
-  `CALLREFERENCE` varchar(256) DEFAULT NULL,
-  `CALLEDNUMBER` varchar(256) DEFAULT NULL,
-  `MSRNNAI` bigint(20) DEFAULT NULL,
-  `MSRNNPI` bigint(20) DEFAULT NULL,
-  `CALLINGNUMBER` varchar(256) DEFAULT NULL,
-  `MCC` varchar(256) DEFAULT NULL,
-  `MNC` varchar(256) DEFAULT NULL,
-  `CAUSEINDCAUSEVALUE` bigint(20) DEFAULT NULL,
-  `CELLID` varchar(256) DEFAULT NULL,
-  `CALLDURATION` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Data exporting was unselected.
-
--- Dumping structure for table .cdr_voice_details
-DROP TABLE IF EXISTS `cdr_voice_details`;
-CREATE TABLE IF NOT EXISTS `cdr_voice_details` (
-  `EVENTSRECD` bigint(20) DEFAULT NULL,
-  `IAMRECDAT` datetime DEFAULT NULL,
-  `ANMRECDAT` datetime DEFAULT NULL,
-  `CALLREFERENCE` varchar(256) DEFAULT NULL,
-  `CALLEDNUMBER` varchar(256) DEFAULT NULL,
-  `MSRNNAI` bigint(20) DEFAULT NULL,
-  `MSRNNPI` bigint(20) DEFAULT NULL,
-  `CALLINGNUMBER` varchar(256) DEFAULT NULL,
-  `MCC` varchar(256) DEFAULT NULL,
-  `MNC` varchar(256) DEFAULT NULL,
-  `CAUSEINDCAUSEVALUE` bigint(20) DEFAULT NULL,
-  `CELLID` varchar(256) DEFAULT NULL,
-  `CALLDURATION` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Data exporting was unselected.
-
--- Dumping structure for table .cdr_voice_incompleted
-DROP TABLE IF EXISTS `cdr_voice_incompleted`;
-CREATE TABLE IF NOT EXISTS `cdr_voice_incompleted` (
-  `EVENTSRECD` bigint(20) DEFAULT NULL,
-  `IAMRECDAT` datetime DEFAULT NULL,
-  `ANMRECDAT` datetime DEFAULT NULL,
-  `CALLREFERENCE` varchar(256) DEFAULT NULL,
-  `CALLEDNUMBER` varchar(256) DEFAULT NULL,
-  `MSRNNAI` bigint(20) DEFAULT NULL,
-  `MSRNNPI` bigint(20) DEFAULT NULL,
-  `CALLINGNUMBER` varchar(256) DEFAULT NULL,
-  `MCC` varchar(256) DEFAULT NULL,
-  `MNC` varchar(256) DEFAULT NULL,
-  `CAUSEINDCAUSEVALUE` bigint(20) DEFAULT NULL,
-  `CELLID` varchar(256) DEFAULT NULL,
-  `CALLDURATION` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Data exporting was unselected.
-
--- Dumping structure for procedure .gm_data_report
-DROP PROCEDURE IF EXISTS `gm_data_report`;
-DELIMITER //
-CREATE  PROCEDURE `gm_data_report`(
-	IN `in_start_date` varchar(50),
-	IN `in_end_date` varchar(50)
-
-
-)
-BEGIN
-  -- **********************************************************************
-  -- Procedure: gm_data_report
-  -- Author: Parul Shrivastava
-  -- Date: Nov 1, 2019
-  
-  -- Description: Procedure returns the report genarted 
-  -- **********************************************************************
-
-	SELECT 
-	report_metadata.ICCID,
-	report_metadata.MSISDN,
-	report_metadata.IMSI,
-	report_metadata.RATE_PLAN_NAME,
-	cdr_data_details.START_TIME,
-	cdr_data_details.STOP_TIME,
-	cdr_data_details.DOWNLINK_BYTES,
-	cdr_data_details.UPLINK_BYTES,
-	cdr_data_details.TOTAL_BYTES,
-	cdr_data_details.APN_ID,
-	cdr_data_details.SERVED_PDP_ADDRESS,
-	cdr_data_details.RECORD_OPENING_TIME,
-	-- cdr_data_details.CURATION_SEC,
-	cdr_data_details.CAUSE_FOR_CLOSING,
-	cdr_data_details.SERVICE_DATA_FLOW_ID
-	FROM (report_metadata
-	INNER JOIN cdr_data_details
-	ON report_metadata.ID = cdr_data_details.ID)
-	WHERE cdr_data_details.STOP_TIME=in_start_date;
-
-
-END//
-DELIMITER ;
-
--- Dumping structure for procedure .gm_sms_delivered_report
-DROP PROCEDURE IF EXISTS `gm_sms_delivered_report`;
-DELIMITER //
-CREATE  PROCEDURE `gm_sms_delivered_report`(
-	IN `in_start_date` varchar(50),
-	IN `in_end_date` varchar(50)
-
-
-
-
-)
-BEGIN
-  -- **********************************************************************
-  -- Procedure: gm_sms_delivered_report
-  -- Author: Parul Shrivastava
-  -- Date: Nov 1, 2019
-  
-  -- Description: Procedure returns the sms delivered report genarted 
-  -- **********************************************************************
-
-	SELECT 
-    report_metadata.ICCID as ICCID,
-	report_metadata.MSISDN as MSISDN,
-	report_metadata.IMSI as IMSI,
-    report_metadata.MNO_ACCOUNTID as SUPPLIER_ACCOUNT_ID ,
-	report_metadata.BILLING_CYCLE AS BILLING_CYCLE_DATE,
-	cdr_sms_details.SMS_TYPE AS CALL_DIRACTION,
-	report_metadata.RATE_PLAN_NAME AS PLAN,
-    cdr_sms_details.SENT_TIME AS ORIGINATION_DATE,
-    cdr_sms_details.ORIGINATION_GT AS SERVING_SWITCH,
-	cdr_sms_details.SOURCE AS ORIGINATION_ADDRESS ,
-    cdr_sms_details.DESTINATION AS DESTINATION_ADDRESS,
-    cdr_sms_details.DESTINATION_GT,
-	cdr_sms_details.SUBSCRIBER_IMSI AS OPERATOR_NETWORK
-	FROM (report_metadata
-	INNER JOIN cdr_sms_details
-	ON report_metadata.ID = cdr_sms_details.ID)
-	WHERE cdr_sms_details.FINAL_TIME=in_start_date
-	and cdr_sms_details.SMS_STATUS = 'Success';
-
-END//
-DELIMITER ;
-
--- Dumping structure for procedure .gm_sms_undelivered_report
-DROP PROCEDURE IF EXISTS `gm_sms_undelivered_report`;
-DELIMITER //
-CREATE  PROCEDURE `gm_sms_undelivered_report`(
-	IN `in_start_date` varchar(50),
-	IN `in_end_date` varchar(50)
-
-
-
-
-)
-BEGIN
-  -- **********************************************************************
-  -- Procedure: gm_sms_undelivered_report
-  -- Author: Parul Shrivastava
-  -- Date: Nov 1, 2019
-  
-  -- Description: Procedure returns the sms undelivered report genarted 
-  -- **********************************************************************
-
-	SELECT 
-        report_metadata.ICCID as ICCID,
-	report_metadata.MSISDN as MSISDN,
-	report_metadata.IMSI as IMSI,
-    report_metadata.MNO_ACCOUNTID as SUPPLIER_ACCOUNT_ID ,
-	report_metadata.BILLING_CYCLE AS BILLING_CYCLE_DATE,
-	cdr_sms_details.SMS_TYPE AS CALL_DIRACTION,
-	report_metadata.RATE_PLAN_NAME AS PLAN,
-    cdr_sms_details.SENT_TIME AS ORIGINATION_DATE,
-    cdr_sms_details.ORIGINATION_GT AS SERVING_SWITCH,
-	cdr_sms_details.SOURCE AS ORIGINATION_ADDRESS ,
-    cdr_sms_details.DESTINATION AS DESTINATION_ADDRESS,
-    cdr_sms_details.DESTINATION_GT,
-	cdr_sms_details.SUBSCRIBER_IMSI AS OPERATOR_NETWORK,
-    cdr_sms_details.REASON AS CALL_TERMINATIONS_REASON
-	FROM (report_metadata
-	INNER JOIN cdr_sms_details
-	ON report_metadata.ID = cdr_sms_details.ID)
-	WHERE cdr_sms_details.FINAL_TIME=in_start_date
-    and cdr_sms_details.SMS_STATUS ='Failure';
-END//
-DELIMITER ;
-
--- Dumping structure for procedure .gm_utility_last_report_generated
-DROP PROCEDURE IF EXISTS `gm_utility_last_report_generated`;
-DELIMITER //
-CREATE  PROCEDURE `gm_utility_last_report_generated`(
-	IN `in_report_type` VARCHAR(50),
-	IN `in_report_date` varchar(50)
-
-)
-    COMMENT 'return the date of last report generated '
-BEGIN
-  -- **********************************************************************
-  -- Procedure: gm_utility_last_report_generated
-  -- Author: Parul Shrivastava
-  -- Date: Nov 1, 2019
-  
-  -- Description: Utility returns the last executed process report 
-  -- **********************************************************************
-
-	DECLARE last_sanity_date varchar(255);
-   DECLARE last_execution_date varchar(255);
-   
-	SET last_sanity_date= (SELECT data_processing_date FROM report_data_details where data_node =in_report_type  LIMIT 1);
-	SET last_execution_date = (SELECT last_execution_time FROM report_genration_details where report_id = 1  LIMIT 1);
-    
-	IF(last_execution_date <= last_sanity_date)
-	THEN 
-	SELECT max(last_execution_time) as Last_Report_date
-	FROM 
-	report_genration_details
-	INNER JOIN report_data_details 
-	ON (report_data_details.id = report_genration_details.report_id)
-	WHERE report_data_details.data_node =  in_report_type
-    AND report_data_details.is_processed = 1
-	GROUP BY (report_id);
-    ELSE
-		select "wrong date selection ";
-    END IF;
-
-
-END//
-DELIMITER ;
-
--- Dumping structure for procedure .gm_utility_update_data_details
-DROP PROCEDURE IF EXISTS `gm_utility_update_data_details`;
-DELIMITER //
-CREATE  PROCEDURE `gm_utility_update_data_details`(
-IN `in_data_node` varchar(100),
-IN `in_isprocess_value` int(10))
-BEGIN
-  -- **********************************************************************
-  -- Procedure: gm_utility_update_data_details
-  -- Author: Parul Shrivastava
-  -- Date: Nov 4, 2019
-  
-  -- Description: Utility to update the data_details values according to filters 
-  -- **********************************************************************
-	
-    IF (in_data_node = 'SMS')
-    THEN
-		update report_data_details
-		set data_processing_date =current_timestamp,
-		is_processed = in_isprocess_value
-		where data_node = 'SMS(Delivered)'
-		or data_node = 'SMS(Undelivered)'
-		;
-    else
-		update report_data_details
-		set data_processing_date =current_timestamp(),
-		is_processed = in_isprocess_value
-		where data_node = in_data_node;
-    
-    END IF;
-    
-
-END//
-DELIMITER ;
-
--- Dumping structure for procedure .gm_voice_report
-DROP PROCEDURE IF EXISTS `gm_voice_report`;
-DELIMITER //
-CREATE  PROCEDURE `gm_voice_report`(
-	IN `in_start_date` varchar(50)
-,
-	IN `in_end_date` varchar(50)
-)
-BEGIN
- -- **********************************************************************
-  -- Procedure: gm_voice_report
-  -- Author: Parul Shrivastava
-  -- Date: Nov 2, 2019
-  
-  -- Description: Procedure is use to generate the voicce report according to the creation date  
-  -- **********************************************************************
-	SELECT 
-    report_metadata.ICCID,
-	report_metadata.MSISDN,
-	report_metadata.IMSI,
-	report_metadata.RATE_PLAN_NAME,
-    cdr_voice_details.START_TIME,
-	cdr_voice_details.CALLINGNUMBER,
-	cdr_voice_details.CALLEDNUMBER,
-	cdr_voice_details.CALLDURATION,
-	cdr_voice_details.ANMRECDAT
-	FROM (report_metadata
-	INNER JOIN cdr_voice_rw_completed_calls_archive
-    INNER JOIN cdr_voice_rw_incompleted_calls_archive
-	ON report_metadata.ID = cdr_voice_rw_completed_calls_archive.ID
-    and report_metadata.ID = cdr_voice_rw_incompleted_calls_archive.ID)
-	WHERE IAMRECDAT >= to_date(in_start_date, 'YYYY-MM-DD HH24:MI:SS')
-    AND  IAMRECDAT <= to_date(in_start_date, 'YYYY-MM-DD HH24:MI:SS'); 
-
-END//
-DELIMITER ;
-
--- Dumping structure for table .reports
+-- Dumping structure for table reports
 DROP TABLE IF EXISTS `reports`;
 CREATE TABLE IF NOT EXISTS `reports` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(256) NOT NULL DEFAULT '0' COMMENT 'reports names',
-  `interval_value` int(11) NOT NULL DEFAULT '0' COMMENT 'Frequency  value ',
-  `interval_unit` varchar(50) NOT NULL DEFAULT '0' COMMENT 'Frequency  type',
-  `remarks` varchar(256) NOT NULL DEFAULT '0' COMMENT 'description',
-  PRIMARY KEY (`id`)
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NAME` varchar(256) NOT NULL DEFAULT '0' COMMENT 'reports names',
+  `INTERVAL_VALUE` int(11) NOT NULL DEFAULT '0' COMMENT 'Frequency  value ',
+  `INTERVAL_UNIT` varchar(50) NOT NULL DEFAULT '0' COMMENT 'Frequency  type',
+  `REMARKS` varchar(256) NOT NULL DEFAULT '0' COMMENT 'description',
+  PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='contains details about the reports';
 
--- Data exporting was unselected.
+-- Dumping data for table reports: ~7 rows (approximately)
+/*!40000 ALTER TABLE `reports` DISABLE KEYS */;
+INSERT INTO `reports` (`ID`, `NAME`, `INTERVAL_VALUE`, `INTERVAL_UNIT`, `REMARKS`) VALUES
+  (1, 'SMS(Delivered)', 1, 'Daily', 'gm_sms_delivered_report'),
+  (2, 'SMS(Undelivered)', 1, 'Daily', 'gm_sms_undelivered_report'),
+  (3, 'Data', 1, 'Daily', 'gm_voice_report'),
+  (4, 'Voice', 1, 'Daily', 'gm_data_report'),
+  (5, 'mobile_number_reconciliation', 1, 'Daily', 'gm_mobile_number_reconciliation_report'),
+  (6, 'gm_apn_billing_cycle_report', 1, 'Monthly', 'gm_apn_billing_cycle_report'),
+  (7, 'OTA', 0, '0', '0');
+/*!40000 ALTER TABLE `reports` ENABLE KEYS */;
 
--- Dumping structure for table .report_data_details
+-- Dumping structure for table report_data_details
 DROP TABLE IF EXISTS `report_data_details`;
 CREATE TABLE IF NOT EXISTS `report_data_details` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `data_node` varchar(256) NOT NULL,
-  `data_processing_date` datetime NOT NULL,
-  `is_processed` tinyint(4) NOT NULL,
-  PRIMARY KEY (`id`)
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `DATA_NODE` varchar(256) DEFAULT NULL,
+  `REPORT_NODE` varchar(100) DEFAULT NULL,
+  `DATA_PROCESSING_DATE` datetime NOT NULL,
+  `IS_PROCESSED` tinyint(4) NOT NULL,
+  PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='contains details of data fetched from gcontrol and mediation database.';
 
--- Data exporting was unselected.
+-- Dumping data for table report_data_details: ~10 rows (approximately)
+/*!40000 ALTER TABLE `report_data_details` DISABLE KEYS */;
+INSERT INTO `report_data_details` (`ID`, `DATA_NODE`, `REPORT_NODE`, `DATA_PROCESSING_DATE`, `IS_PROCESSED`) VALUES
+  (1, 'cdr_sms_details', 'SMS(Delivered)', '2019-12-02 06:35:56', 1),
+  (2, 'cdr_data_details', 'SMS(Undelivered)', '2019-12-02 06:35:56', 1),
+  (3, 'pgw_svc_data', 'Data', '2019-12-02 06:36:32', 1),
+  (4, 'cdr_voice_complete', 'Voice', '2019-12-02 06:54:15', 1),
+  (5, 'cdr_voice_incomplete', 'Voice', '2019-12-02 06:47:17', 1),
+  (6, 'cdr_voice_tadig_codes', 'Voice', '2019-12-02 06:51:10', 1),
+  (7, 'metadata', 'metadata', '2019-11-25 11:52:26', 1),
+  (8, 'apn_billing_cycle_aggregation', 'apn_billing_cycle_aggregation', '2019-11-25 11:52:26', 0),
+  (9, 'OTA', 'metadata', '0000-00-00 00:00:00', 0),
+  (10, 'retail_revenue_share', NULL, '0000-00-00 00:00:00', 0);
+/*!40000 ALTER TABLE `report_data_details` ENABLE KEYS */;
 
--- Dumping structure for table .report_genration_details
-DROP TABLE IF EXISTS `report_genration_details`;
-CREATE TABLE IF NOT EXISTS `report_genration_details` (
+-- Dumping structure for table report_generation_details
+DROP TABLE IF EXISTS `report_generation_details`;
+CREATE TABLE IF NOT EXISTS `report_generation_details` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `report_id` int(11) NOT NULL DEFAULT '0',
-  `start_date` datetime NOT NULL,
-  `end_date` datetime NOT NULL,
-  `last_execution_time` date NOT NULL,
-  `report_file_path` text NOT NULL,
+  `REPORT_ID` int(11) NOT NULL DEFAULT '0',
+  `START_DATE` datetime DEFAULT NULL,
+  `END_DATE` datetime DEFAULT NULL,
+  `LAST_EXECUTION_TIME` date DEFAULT NULL,
+  `REPORT_FILE_PATH` text,
   PRIMARY KEY (`id`),
-  KEY `fk_reports` (`report_id`),
+  KEY `fk_reports` (`REPORT_ID`),
   CONSTRAINT `fk_reports` FOREIGN KEY (`report_id`) REFERENCES `reports` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='contains genration details of every reports in reports table.';
 
--- Data exporting was unselected.
+-- Dumping data for table report_generation_details: ~7 rows (approximately)
+/*!40000 ALTER TABLE `report_generation_details` DISABLE KEYS */;
+INSERT INTO `report_generation_details` (`id`, `REPORT_ID`, `START_DATE`, `END_DATE`, `LAST_EXECUTION_TIME`, `REPORT_FILE_PATH`) VALUES
+  (1, 1, '2019-09-10 00:00:00', '2019-10-31 00:00:00', '2019-11-04', 'globetocuh/report'),
+  (2, 2, '2019-08-10 00:00:00', '2019-10-30 00:00:00', '2019-11-29', '/home/palaktiwari/GMReports_Client//basic_reports/smsUndeliveredCdr20191129030018.csv'),
+  (3, 3, '2019-08-10 00:00:00', '2019-10-31 00:00:00', '2019-11-01', '/home/palaktiwari/GMReports_Client//basic_reports/dataCdr20191202062118.csv'),
+  (4, 4, '2019-08-10 00:00:00', '2019-10-31 00:00:00', '2019-10-31', 'GLOBETOCH/VOICE/REPORT'),
+  (5, 5, '2019-08-10 00:00:00', '2019-10-31 00:00:00', '2019-11-01', 'globetocuh/report'),
+  (6, 6, '2019-08-10 00:00:00', '2019-10-31 00:00:00', '2019-11-01', 'globetocuh/apn_billing_cycle/report'),
+  (7, 7, '2019-10-01 00:00:00', '2019-10-31 00:00:00', '2019-10-31', 'globetocuh/report');
+/*!40000 ALTER TABLE `report_generation_details` ENABLE KEYS */;
 
--- Dumping structure for table .report_metadata
-DROP TABLE IF EXISTS `report_metadata`;
-CREATE TABLE IF NOT EXISTS `report_metadata` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `ICCID` varchar(20) DEFAULT NULL,
-  `MSISDN` varchar(255) DEFAULT NULL,
-  `IMSI` varchar(255) DEFAULT NULL,
-  `MNO_ACCOUNTID` bigint(20) DEFAULT NULL,
-  `ENT_ACCOUNTID` bigint(20) DEFAULT NULL,
-  `RATE_PLAN_ID` bigint(20) DEFAULT NULL,
-  `BILLING_CYCLE` bigint(3) DEFAULT NULL,
-  `WHOLESALE_PLAN_ID` bigint(20) DEFAULT NULL,
-  `SERVICE_PLAN_ID` bigint(20) DEFAULT '1',
-  `ACCOUNT_NAME` varchar(1000) DEFAULT NULL,
-  `RATE_PLAN_NAME` varchar(50) DEFAULT NULL,
-  `WHOLE_SALE_NAME` varchar(50) DEFAULT NULL,
-  `SERVICE_PLAN_NAME` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- Dumping structure for table report_mapping
+DROP TABLE IF EXISTS `report_mapping`;
+CREATE TABLE IF NOT EXISTS `report_mapping` (
+  `REPORT_ID` int(11) DEFAULT NULL,
+  `NODE_ID` int(11) DEFAULT NULL,
+  KEY `REPORT_ID` (`REPORT_ID`),
+  KEY `NODE_ID` (`NODE_ID`),
+  CONSTRAINT `NODE_ID` FOREIGN KEY (`NODE_ID`) REFERENCES `report_data_details` (`ID`),
+  CONSTRAINT `REPORT_ID` FOREIGN KEY (`REPORT_ID`) REFERENCES `reports` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='this table is used to generate the mapping between reports and respective tables  ';
 
--- Data exporting was unselected.
+-- Dumping data for table report_mapping: ~11 rows (approximately)
+/*!40000 ALTER TABLE `report_mapping` DISABLE KEYS */;
+INSERT INTO `report_mapping` (`REPORT_ID`, `NODE_ID`) VALUES
+  (1, 1),
+  (2, 1),
+  (3, 3),
+  (3, 6),
+  (4, 4),
+  (4, 5),
+  (4, 6),
+  (5, 7),
+  (6, 3),
+  (6, 2),
+  (7, 9);
+/*!40000 ALTER TABLE `report_mapping` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

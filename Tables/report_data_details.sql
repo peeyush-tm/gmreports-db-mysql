@@ -14,11 +14,12 @@
 -- Dumping structure for table report_data_details
 DROP TABLE IF EXISTS `report_data_details`;
 CREATE TABLE IF NOT EXISTS `report_data_details` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `data_node` varchar(256) NOT NULL,
-  `data_processing_date` datetime NOT NULL,
-  `is_processed` tinyint(4) NOT NULL,
-  PRIMARY KEY (`id`)
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `DATA_NODE` varchar(256) DEFAULT NULL,
+  `REPORT_NODE` varchar(100) DEFAULT NULL,
+  `DATA_PROCESSING_DATE` datetime NOT NULL,
+  `IS_PROCESSED` tinyint(4) NOT NULL,
+  PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='contains details of data fetched from gcontrol and mediation database.';
 
 -- Data exporting was unselected.
