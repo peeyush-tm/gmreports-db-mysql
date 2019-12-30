@@ -11,12 +11,14 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for procedure gm_data_report
+-- Dumping structure for procedure gm_reports.gm_data_report
 DROP PROCEDURE IF EXISTS `gm_data_report`;
 DELIMITER //
 CREATE  PROCEDURE `gm_data_report`(
 	IN `in_start_date` varchar(50),
 	IN `in_end_date` varchar(50)
+
+
 
 
 
@@ -82,7 +84,8 @@ BEGIN
 	ON report_metadata.IMSI = cdr_data_details.SERVED_IMSI)
 	INNER JOIN pgw_svc_data
 	ON pgw_svc_data.SERVED_IMSI= cdr_data_details.SERVED_IMSI)
-	WHERE date(cdr_data_details.STOP_TIME) = date(start_date);
+	WHERE date(cdr_data_details.STOP_TIME) = date(start_date)
+	group by cdr_data_details.SERVED_IMSI, pgw_svc_data.CHARGING_ID;
 
 
 END//
