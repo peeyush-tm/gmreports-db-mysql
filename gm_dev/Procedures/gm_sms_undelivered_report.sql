@@ -11,12 +11,15 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for procedure gm_sms_undelivered_report
+-- Dumping structure for procedure gm_reports.gm_sms_undelivered_report
 DROP PROCEDURE IF EXISTS `gm_sms_undelivered_report`;
 DELIMITER //
 CREATE  PROCEDURE `gm_sms_undelivered_report`(
 	IN `in_start_date` varchar(50),
 	IN `in_end_date` varchar(50)
+
+
+
 
 
 
@@ -60,7 +63,7 @@ BEGIN
 	report_metadata.IMSI as IMSI,
     report_metadata.MNO_ACCOUNTID as SUPPLIER_ACCOUNT_ID ,
 	concat(@temp_date ,' - ',date_duration) AS BILLING_CYCLE_DATE,
-	cdr_sms_details.SMS_TYPE AS CALL_DIRACTION,
+	cdr_sms_details.SMS_TYPE AS CALL_DIRECTION,
 	report_metadata.WHOLE_SALE_NAME AS PLAN,
     cdr_sms_details.SENT_TIME AS ORIGINATION_DATE,
     cdr_sms_details.ORIGINATION_GT AS SERVING_SWITCH,
@@ -71,9 +74,12 @@ BEGIN
     cdr_sms_details.REASON AS CALL_TERMINATIONS_REASON
 	FROM (report_metadata
 	INNER JOIN cdr_sms_details
-	ON report_metadata.ID = cdr_sms_details.ID)
-	WHERE date(cdr_sms_details.FINAL_TIME)= start_date
-    and cdr_sms_details.SMS_STATUS ='Failed';
+	ON report_metadata.MSISDN = cdr_sms_details.SOURCE 
+	OR report_metadata.MSISDN = cdr_sms_details.DESTINATION)	
+   WHERE date(cdr_sms_details.FINAL_TIME)=start_date
+   and cdr_sms_details.SMS_STATUS ='Failed'
+   GROUP BY IMSI,MSISDN ,CALL_DIRECTION ,  ORIGINATION_DATE ;
+   
 END//
 DELIMITER ;
 
