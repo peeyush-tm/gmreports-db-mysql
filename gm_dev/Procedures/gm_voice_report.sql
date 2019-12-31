@@ -11,13 +11,16 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for procedure gm_voice_report
+-- Dumping structure for procedure gm_reports.gm_voice_report
 DROP PROCEDURE IF EXISTS `gm_voice_report`;
 DELIMITER //
 CREATE  PROCEDURE `gm_voice_report`(
 	IN `in_start_date` varchar(50)
 ,
 	IN `in_end_date` varchar(50)
+
+
+
 
 
 
@@ -75,8 +78,8 @@ BEGIN
 	cdr_voice_incompleted.CAUSEINDCAUSEVALUE
 	FROM cdr_voice_incompleted 
 	INNER JOIN report_metadata 
-	ON report_metadata.ID = cdr_voice_incompleted.ID
-	WHERE date(ANMRECDAT) =start_date;
+	ON report_metadata.IMSI = cdr_voice_incompleted.CALLEDNUMBER
+	WHERE date(cdr_voice_incompleted.ANMRECDAT) = start_date;
 	    
 	-- generate a table to fetch the data from the complete voice table 
 	DROP  TEMPORARY TABLE if EXISTS temp_voice_incomplete;
@@ -97,8 +100,8 @@ BEGIN
 	cdr_voice_completed.CAUSEINDCAUSEVALUE
 	FROM cdr_voice_completed 
 	INNER JOIN report_metadata 
-	ON report_metadata.ID = cdr_voice_completed.ID
-	WHERE date(ANMRECDAT) = start_date;
+	ON report_metadata.IMSI = cdr_voice_completed.CALLEDNUMBER
+	WHERE date(cdr_voice_completed.ANMRECDAT) = start_date;
 
 	-- preparing the data from merging the both table complete and incomplete	
 	DROP  TEMPORARY TABLE if EXISTS temp_voice;
@@ -121,7 +124,8 @@ BEGIN
 	ANMRECDAT AS 'ORIGINATION DATE',
 	(MCC+MNC) AS 'OPERATOR NETWORK',
 	CAUSEINDCAUSEVALUE AS 'CALL TERMINATION REASON'
-	FROM temp_voice;
+	FROM temp_voice
+	GROUP BY IMSI,'ANSWER DURATION','ORIGINATION DATE';
 
 END//
 DELIMITER ;
