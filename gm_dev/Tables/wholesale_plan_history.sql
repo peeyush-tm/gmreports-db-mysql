@@ -10,16 +10,21 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table gm_reports.cdr_voice_tadig_codes
-DROP TABLE IF EXISTS `cdr_voice_tadig_codes`;
-CREATE TABLE IF NOT EXISTS `cdr_voice_tadig_codes` (
-  `TC_TADIG_CODE` varchar(256) NOT NULL,
-  `TC_NETWORK_ID` bigint(20) NOT NULL,
-  `TC_MCC` varchar(256) DEFAULT '0',
-  `TC_MNC` varchar(256) DEFAULT '0',
-  `TC_REC_CHANGED_AT` datetime DEFAULT NULL,
-  `TC_REC_CHANGED_BY` varchar(256) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='cdr_voice_tadig_codes';
+-- Dumping structure for table gm_reports.wholesale_plan_history
+DROP TABLE IF EXISTS `wholesale_plan_history`;
+CREATE TABLE IF NOT EXISTS `wholesale_plan_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `MESSAGE` varchar(200) DEFAULT '0',
+  `OLD_VALUE` varchar(50) DEFAULT '0',
+  `NEW_VALUE` varchar(50) DEFAULT '0',
+  `RESULT` varchar(50) DEFAULT '0',
+  `CREATE_DATE` varchar(50) DEFAULT '0',
+  `ASSET_ID` varchar(50) DEFAULT '0',
+  `ATTRIBUTE` varchar(50) DEFAULT '0',
+  `ICCID` varchar(50) DEFAULT '0',
+  `IMSI` varchar(50) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

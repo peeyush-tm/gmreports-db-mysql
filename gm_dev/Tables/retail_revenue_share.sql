@@ -10,16 +10,19 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table gm_reports.cdr_voice_tadig_codes
-DROP TABLE IF EXISTS `cdr_voice_tadig_codes`;
-CREATE TABLE IF NOT EXISTS `cdr_voice_tadig_codes` (
-  `TC_TADIG_CODE` varchar(256) NOT NULL,
-  `TC_NETWORK_ID` bigint(20) NOT NULL,
-  `TC_MCC` varchar(256) DEFAULT '0',
-  `TC_MNC` varchar(256) DEFAULT '0',
-  `TC_REC_CHANGED_AT` datetime DEFAULT NULL,
-  `TC_REC_CHANGED_BY` varchar(256) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='cdr_voice_tadig_codes';
+-- Dumping structure for table gm_reports.retail_revenue_share
+DROP TABLE IF EXISTS `retail_revenue_share`;
+CREATE TABLE IF NOT EXISTS `retail_revenue_share` (
+  `ID` bigint(50) NOT NULL AUTO_INCREMENT,
+  `START_DATE` varchar(50) DEFAULT NULL,
+  `DATA_USED` varchar(50) DEFAULT NULL,
+  `CREDIT_AMOUNT` varchar(50) DEFAULT NULL,
+  `PACKAGE_CODE` varchar(50) DEFAULT NULL,
+  `ORDER_ID` varchar(50) DEFAULT NULL,
+  `UUID_IMSI` varchar(50) DEFAULT NULL,
+  `IMSI` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='reatails revenue table store the data from the BSS API''s';
 
 -- Data exporting was unselected.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

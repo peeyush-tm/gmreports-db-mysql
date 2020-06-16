@@ -10,16 +10,12 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for table gm_reports.cdr_voice_tadig_codes
-DROP TABLE IF EXISTS `cdr_voice_tadig_codes`;
-CREATE TABLE IF NOT EXISTS `cdr_voice_tadig_codes` (
-  `TC_TADIG_CODE` varchar(256) NOT NULL,
-  `TC_NETWORK_ID` bigint(20) NOT NULL,
-  `TC_MCC` varchar(256) DEFAULT '0',
-  `TC_MNC` varchar(256) DEFAULT '0',
-  `TC_REC_CHANGED_AT` datetime DEFAULT NULL,
-  `TC_REC_CHANGED_BY` varchar(256) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='cdr_voice_tadig_codes';
+-- Dumping structure for table gm_reports.gm_country_code_mapping
+DROP TABLE IF EXISTS `gm_country_code_mapping`;
+CREATE TABLE IF NOT EXISTS `gm_country_code_mapping` (
+  `account` varchar(50) DEFAULT '0',
+  `country_Code` int(11) DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Data exporting was unselected.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
