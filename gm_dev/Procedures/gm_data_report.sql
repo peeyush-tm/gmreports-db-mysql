@@ -2,36 +2,22 @@
 -- Host:                         192.168.1.122
 -- Server version:               10.1.12-MariaDB - MariaDB Server
 -- Server OS:                    Linux
--- HeidiSQL Version:             10.2.0.5599
+-- HeidiSQL Version:             9.3.0.4984
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Dumping structure for procedure gm_reports.gm_data_report
-DROP PROCEDURE IF EXISTS `gm_data_report`;
 DELIMITER //
-CREATE  PROCEDURE `gm_data_report`(
-	IN `in_start_date` varchar(50),
-	IN `in_end_date` varchar(50)
-
-
-
-
-
-
-
-
-
-
-)
-    COMMENT 'gm_data_report'
+CREATE  PROCEDURE `gm_data_report`(IN `in_start_date` varchar(50), IN `in_end_date` varchar(50)
+, IN `in_account_id` VARCHAR(50))
+    COMMENT 'gm_data_report_new'
 BEGIN
   -- **********************************************************************
-  -- Procedure: gm_data_report
+  -- Procedure: gm_data_report_new
   -- Author: Parul Shrivastava
   -- Date: Nov 1, 2019
    
@@ -58,8 +44,10 @@ BEGIN
 	report_metadata.ICCID AS ICCID,
 	report_metadata.MSISDN AS MSISDN,
 	report_metadata.IMSI AS IMSI,
-    report_metadata.ACCOUNT_NAME AS SUPPLIER_ACCOUNT_ID ,
-	concat(@temp_date ,' - ',date_duration) AS BILLING_CYCLE_DATE,
+-- 	report_metadata.ACCOUNT_NAME AS SUPPLIER_ACCOUNT_ID ,
+   gm_country_code_mapping.country_Code AS SUPPLIER_ACCOUNT_ID ,
+	-- concat(@temp_date ,' - ',date_duration) AS BILLING_CYCLE_DATE,
+	'5' AS BILLING_CYCLE_DATE,
 	report_metadata.WHOLE_SALE_NAME AS PLAN,
    cdr_data_details.START_TIME AS ORIGINATION_DATE,
    cdr_data_details.UPLINK_BYTES AS TRANSMIT_BYTE,
@@ -69,28 +57,43 @@ BEGIN
    cdr_data_details.APN_ID AS APN,
 	cdr_data_details.SERVED_PDP_ADDRESS AS DEVICE_IP_ADDRESS,
    cdr_data_details.SERVED_IMSI AS OPERATOR_NETWORK,
-	cdr_data_details.RECORD_OPENING_TIME AS ORIGINATION_DATE,
+   concat(cdr_data_details.ULI_MCC,',',cdr_data_details.ULI_MNC) AS OPERATOR_NETWORK,
+	cdr_data_details.RECORD_OPENING_TIME AS ORIGINATION_PLAN_DATE,
 	cdr_data_details.DURATION_SEC AS SESSION_DURATION,
    -- pgw_svc_data.SERVICE_DATA_FLOW_ID  ,
 	cdr_data_details.CAUSE_FOR_CLOSING AS CALL_TERMINATION_REASON,
   	pgw_svc_data.SERVICE_DATA_FLOW_ID AS RATING_STREAM_ID,
-    -- 6 PARAMTER MISING 
-    
+    -- 6 PARAMTER MISING     
    cdr_data_details.SERVING_NODE_IPADDR AS SERVING_SWITCH,
-   cdr_data_details.RAT_TYPE AS CALL_TECHNOLOGY_TYPE,
-   cdr_data_details.PGW_ADDRESS AS GGSN_IP_ADDRESS
+   case when cdr_data_details.RAT_TYPE=1 then 'UTRAN - 3G' when cdr_data_details.RAT_TYPE=6 then 'EUTRAN - 4G' when cdr_data_details.RAT_TYPE=2 then 'GERAN - 2G' else cdr_data_details.RAT_TYPE end  AS CALL_TECHNOLOGY_TYPE,
+   cdr_data_details.PGW_ADDRESS AS GGSN_IP_ADDRESS,
+   cdr_data_details.LOCAL_SEQUENCE_NUMBER as Record_Sequence_Number
+	from	((report_metadata
+	INNER JOIN cdr_data_details
+ 	ON report_metadata.IMSI = cdr_data_details.SERVED_IMSI
+	INNER JOIN pgw_svc_data
+	ON 
+	-- pgw_svc_data.SERVED_IMSI= report_metadata.IMSI
+-- 	and 
+	pgw_svc_data.SERVED_IMSI= cdr_data_details.SERVED_IMSI
+	and pgw_svc_data.CHARGING_ID =cdr_data_details.CHARGING_ID)
+	left join gm_country_code_mapping on report_metadata.ACCOUNT_COUNTRIE=gm_country_code_mapping.account)
+	  	WHERE date(cdr_data_details.STOP_TIME) = date(start_date)
+	  	and report_metadata.MNO_ACCOUNTID=in_account_id
+	group by cdr_data_details.SERVED_IMSI, pgw_svc_data.CHARGING_ID;
+	/*
 	FROM ((report_metadata
 	INNER JOIN cdr_data_details
 	ON report_metadata.IMSI = cdr_data_details.SERVED_IMSI)
 	INNER JOIN pgw_svc_data
-	ON pgw_svc_data.SERVED_IMSI= cdr_data_details.SERVED_IMSI)
+	ON pgw_svc_data.SERVED_IMSI= cdr_data_details.SERVED_IMSI
+	left join gm_country_code_mapping on report_metadata.ACCOUNT_COUNTRIE=gm_country_code_mapping.account)
 	WHERE date(cdr_data_details.STOP_TIME) = date(start_date)
 	group by cdr_data_details.SERVED_IMSI, pgw_svc_data.CHARGING_ID;
-
+*/
 
 END//
 DELIMITER ;
-
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

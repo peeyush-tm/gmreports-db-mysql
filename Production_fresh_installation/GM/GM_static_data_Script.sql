@@ -113,6 +113,32 @@ INSERT INTO `report_mapping` (`REPORT_ID`, `NODE_ID`) VALUES
   (7, 9);
 /*!40000 ALTER TABLE `report_mapping` ENABLE KEYS */;
 
+
+
+-- Dumping structure for table gm_reports.gm_country_code_mapping
+DROP TABLE IF EXISTS `gm_country_code_mapping`;
+CREATE TABLE IF NOT EXISTS `gm_country_code_mapping` (
+  `account` varchar(50) DEFAULT '0',
+  `country_Code` int(11) DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Dumping data for table gm_reports.gm_country_code_mapping: ~11 rows (approximately)
+DELETE FROM `gm_country_code_mapping`;
+/*!40000 ALTER TABLE `gm_country_code_mapping` DISABLE KEYS */;
+INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES
+  ('GT MVNO', 2),
+  ('GLOBAL', 3),
+  ('Saudi Arabia', 7),
+  ('Netherlands', 5),
+  ('Australia', 4),
+  ('United Arab Emirates', 8),
+  ('KUWAIT', 9),
+  ('Qatar', 10),
+  ('Koria', 6),
+  ('Globetouch', 1),
+  ('Bahrain', 11);
+
+
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
