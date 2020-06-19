@@ -11,6 +11,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Dumping structure for procedure gm_reports.gm_sms_undelivered_report
+DROP PROCEDURE IF EXISTS `gm_sms_undelivered_report`;
 DELIMITER //
 CREATE  PROCEDURE `gm_sms_undelivered_report`(IN `in_start_date` varchar(50), IN `in_end_date` varchar(50)
 
@@ -64,7 +65,8 @@ BEGIN
 	 gm_country_code_mapping.country_Code AS SUPPLIER_ACCOUNT_ID ,
    '5' AS BILLING_CYCLE_DATE,
 	cdr_sms_details.SMS_TYPE AS CALL_DIRECTION,
-	report_metadata.WHOLE_SALE_NAME AS PLAN,
+	-- report_metadata.WHOLE_SALE_NAME AS PLAN,
+	wholesale_plan_history.NEW_VALUE AS PLAN,
    cdr_sms_details.SENT_TIME AS ORIGINATION_DATE,
    /*cdr_sms_details.ORIGINATION_GT AS SERVING_SWITCH,
 	cdr_sms_details.SOURCE AS ORIGINATION_ADDRESS ,
@@ -88,7 +90,9 @@ BEGIN
 	INNER JOIN cdr_sms_details
 	ON report_metadata.MSISDN = cdr_sms_details.SOURCE 
 	OR report_metadata.MSISDN = cdr_sms_details.DESTINATION
-	left join gm_country_code_mapping on report_metadata.ACCOUNT_COUNTRIE=gm_country_code_mapping.account)	
+	left join gm_country_code_mapping on report_metadata.ACCOUNT_COUNTRIE=gm_country_code_mapping.account
+	left join wholesale_plan_history on wholesale_plan_history.IMSI=report_metadata.IMSI
+	and (cdr_sms_details.FINAL_TIME between  wholesale_plan_history.CREATE_DATE and wholesale_plan_history.CREATE_DATE))	
    WHERE date(cdr_sms_details.FINAL_TIME)=start_date
    and cdr_sms_details.SMS_STATUS ='Failed'
    and report_metadata.MNO_ACCOUNTID=in_account_id
