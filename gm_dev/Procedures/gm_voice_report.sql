@@ -13,7 +13,7 @@
 -- Dumping structure for procedure gm_reports.gm_voice_report
 DROP PROCEDURE IF EXISTS `gm_voice_report`;
 DELIMITER //
-CREATE PROCEDURE `gm_voice_report`(IN `in_start_date` varchar(50)
+CREATE  PROCEDURE `gm_voice_report`(IN `in_start_date` varchar(50)
 , IN `in_end_date` varchar(50)
 
 
@@ -135,7 +135,7 @@ BEGIN
 	CALLINGNUMBER AS 'CALLING PARTY NUMBER',
 	CALLEDNUMBER AS 'CALLED',
 	CALLDURATION AS 'ANSWER DURATION',
-	case when CALLDURATION=0  then CALLDURATION else CAST(CALLDURATION/60 AS INT)*60+60 end as 'ANSWER DURATION ROUNDED',
+	case when CALLDURATION=0  then CALLDURATION else CAST(CALLDURATION/60 AS INT)*60 end as 'ANSWER DURATION ROUNDED',
 	ANMRECDAT AS 'ORIGINATION DATE',
 	concat(MCC,case when CHAR_LENGTH(MNC)=1 then  concat('0',MNC) else MNC end ) AS 'OPERATOR NETWORK',
 	-- CAUSEINDCAUSEVALUE AS 'CALL TERMINATION REASON',
@@ -165,10 +165,13 @@ BEGIN
 	end AS 'CALL TERMINATION REASON',
 	'Circuit Switched' as 'CALL TYPE',
 	case when MOCALL=1 then 'MO' ELSE 'MT' end 'CALL DIRECTION',
-	temp_wholesale_plan_history.plan AS PLAN
+	temp_wholesale_plan_history.plan AS PLAN,
+	cdr_voice_tadig_codes.TC_TADIG_CODE as TAP_CODE
 	FROM temp_voice
 	left join temp_wholesale_plan_history on temp_wholesale_plan_history.IMSI=temp_voice.IMSI
-	and (ANMRECDAT between  temp_wholesale_plan_history.start_date and temp_wholesale_plan_history.end_date);
+	and (ANMRECDAT between  temp_wholesale_plan_history.start_date and temp_wholesale_plan_history.end_date)
+	left join cdr_voice_tadig_codes on temp_voice.MCC=cdr_voice_tadig_codes.TC_MCC
+	and case when CHAR_LENGTH(temp_voice.MNC)=1 then  concat('0',temp_voice.MNC) else temp_voice.MNC end = cdr_voice_tadig_codes.TC_MNC ;
 -- 	GROUP BY IMSI,'ANSWER DURATION','ORIGINATION DATE';
 	
 
