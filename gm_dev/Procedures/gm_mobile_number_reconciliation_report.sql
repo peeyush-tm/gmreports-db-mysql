@@ -11,8 +11,9 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Dumping structure for procedure gm_reports.gm_mobile_number_reconciliation_report
+DROP PROCEDURE IF EXISTS `gm_mobile_number_reconciliation_report`;
 DELIMITER //
-CREATE  PROCEDURE `gm_mobile_number_reconciliation_report`(IN `in_account_id` VARCHAR(50))
+CREATE PROCEDURE `gm_mobile_number_reconciliation_report`(IN `in_account_id` VARCHAR(50))
     COMMENT 'gm_mobile_number_reconciliation_report'
 BEGIN
   -- **********************************************************************
@@ -31,14 +32,15 @@ BEGIN
     gm_country_code_mapping.country_Code AS SUPPLIER_ACCOUNT_ID,
     SIM_STATE as SIM_STATE_GT,
     case when SIM_STATE='Warm' then 'Device Shipped'
-	 when SIM_STATE='' or SIM_STATE is null then 'UnSoldNewVehicle' 
+	 when SIM_STATE='' or SIM_STATE is NULL or SIM_STATE ='NULL'  then 'UnSoldNewVehicle' 
 	 when SIM_STATE='Active' then 'Subscribed' 
 	 when SIM_STATE='Suspend' then 'Dormant' 
 	 else SIM_STATE end as SIM_STATE_GM,
     RATE_PLAN_NAME AS PRICING_PLAN,
     RATE_PLAN_NAME AS COMMUNCATION_PLAN,
     ACTIVATION_DATE AS ICCID_ACTIVATION_DATE,
-    ICCID as BOOTSTRAP_ICCID
+    -- ICCID as BOOTSTRAP_ICCID
+    BOOTSTRAP_ICCID
     FROM report_metadata
 	 left join gm_country_code_mapping on report_metadata.ACCOUNT_COUNTRIE=gm_country_code_mapping.account
 	 where report_metadata.MNO_ACCOUNTID=in_account_id;

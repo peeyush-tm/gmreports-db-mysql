@@ -11,8 +11,9 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Dumping structure for procedure gm_reports.gm_sms_delivered_report
+DROP PROCEDURE IF EXISTS `gm_sms_delivered_report`;
 DELIMITER //
-CREATE  PROCEDURE `gm_sms_delivered_report`(IN `in_start_date` varchar(50), IN `in_end_date` varchar(50)
+CREATE PROCEDURE `gm_sms_delivered_report`(IN `in_start_date` varchar(50), IN `in_end_date` varchar(50)
 
 
 
@@ -53,7 +54,7 @@ BEGIN
 
    SET start_date:= CAST(in_start_date AS DATEtime);
    
- 
+  CALL `gm_utility_get__wholesale_plan_history`(in_start_date);
 
 	-- Preparing the billing dates
     SET date_duration= LAST_DAY(CONVERT( in_start_date, DATE ));
@@ -71,32 +72,32 @@ BEGIN
    '5' AS BILLING_CYCLE_DATE,
 	cdr_sms_details.SMS_TYPE AS CALL_DIRECTION,
 	-- report_metadata.WHOLE_SALE_NAME AS PLAN,
-	 wholesale_plan_history.NEW_VALUE AS PLAN,
+	 temp_wholesale_plan_history.plan AS PLAN,
    cdr_sms_details.SENT_TIME AS ORIGINATION_DATE,
    case when cdr_sms_details.SMS_TYPE='MO' then cdr_sms_details.ORIGINATION_GT
 	when cdr_sms_details.SMS_TYPE='MT' then cdr_sms_details.DESTINATION_GT 
-	else cdr_sms_details.ORIGINATION_GT end AS SERVING_SWITCH,
+	else NULL end AS SERVING_SWITCH,
 	case when cdr_sms_details.SMS_TYPE='MO' then cdr_sms_details.SOURCE
 	when cdr_sms_details.SMS_TYPE='MT' then cdr_sms_details.DESTINATION
-	else cdr_sms_details.SOURCE end  AS ORIGINATION_ADDRESS ,
+	else NULL end  AS ORIGINATION_ADDRESS ,
    case when cdr_sms_details.SMS_TYPE='MO' then cdr_sms_details.DESTINATION
 	when cdr_sms_details.SMS_TYPE='MT' then cdr_sms_details.SOURCE
-	else cdr_sms_details.DESTINATION end AS DESTINATION_ADDRESS,
+	else NULL end AS DESTINATION_ADDRESS,
     -- cdr_sms_details.DESTINATION_GT,
 	  case when cdr_sms_details.SMS_TYPE='MO' then cdr_sms_details.ORIGINATION_GT
 	when cdr_sms_details.SMS_TYPE='MT' then cdr_sms_details.DESTINATION_GT
-	else cdr_sms_details.DESTINATION end  AS OPERATOR_NETWORK
+	else NULL end  AS OPERATOR_NETWORK
 	FROM (report_metadata
 	INNER JOIN cdr_sms_details
 	ON report_metadata.MSISDN = cdr_sms_details.SOURCE 
 	OR report_metadata.MSISDN = cdr_sms_details.DESTINATION
 	left join gm_country_code_mapping on report_metadata.ACCOUNT_COUNTRIE=gm_country_code_mapping.account
-	left join wholesale_plan_history on wholesale_plan_history.IMSI=report_metadata.IMSI
-	and (cdr_sms_details.FINAL_TIME between  wholesale_plan_history.CREATE_DATE and wholesale_plan_history.CREATE_DATE))	
+	left join temp_wholesale_plan_history on temp_wholesale_plan_history.IMSI=report_metadata.IMSI
+	and (cdr_sms_details.FINAL_TIME between  temp_wholesale_plan_history.start_date and temp_wholesale_plan_history.end_date))	
    WHERE date(cdr_sms_details.FINAL_TIME)=date(start_date)
 	and cdr_sms_details.SMS_STATUS = 'Success'
-	and report_metadata.MNO_ACCOUNTID=in_account_id
-	GROUP BY IMSI,MSISDN ,CALL_DIRECTION ,ORIGINATION_DATE ;
+	and report_metadata.MNO_ACCOUNTID=in_account_id;
+	-- GROUP BY IMSI,MSISDN ,CALL_DIRECTION ,ORIGINATION_DATE ;
 
 
 END//
