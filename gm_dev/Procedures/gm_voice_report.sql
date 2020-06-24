@@ -11,8 +11,9 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Dumping structure for procedure gm_reports.gm_voice_report
+DROP PROCEDURE IF EXISTS `gm_voice_report`;
 DELIMITER //
-CREATE PROCEDURE `gm_voice_report`(IN `in_start_date` varchar(50)
+CREATE  PROCEDURE `gm_voice_report`(IN `in_start_date` varchar(50)
 , IN `in_end_date` varchar(50)
 
 
@@ -78,7 +79,8 @@ BEGIN
 	gm_country_code_mapping.country_Code AS COUNTRY_CODE
 	FROM cdr_voice_incompleted 
 	INNER JOIN report_metadata 
-	ON report_metadata.IMSI = cdr_voice_incompleted.CALLEDNUMBER
+	ON (report_metadata.IMSI = cdr_voice_incompleted.CALLEDNUMBER
+	or report_metadata.IMSI = cdr_voice_incompleted.CALLINGNUMBER)
 	left join gm_country_code_mapping on report_metadata.ACCOUNT_COUNTRIE=gm_country_code_mapping.account
 	WHERE date(cdr_voice_incompleted.ANMRECDAT) = start_date
 	and report_metadata.MNO_ACCOUNTID=in_account_id;
@@ -104,10 +106,14 @@ BEGIN
 	gm_country_code_mapping.country_Code AS COUNTRY_CODE
 	FROM cdr_voice_completed 
 	INNER JOIN report_metadata 
-	ON report_metadata.IMSI = cdr_voice_completed.CALLEDNUMBER
+	ON (report_metadata.IMSI = cdr_voice_completed.CALLEDNUMBER
+		or report_metadata.IMSI = cdr_voice_completed.CALLINGNUMBER)
 	left join gm_country_code_mapping on report_metadata.ACCOUNT_COUNTRIE=gm_country_code_mapping.account
 	WHERE date(cdr_voice_completed.ANMRECDAT) = start_date
 	and report_metadata.MNO_ACCOUNTID=in_account_id;
+	
+
+	CALL `gm_utility_get__wholesale_plan_history`(in_start_date);
 
 	-- preparing the data from merging the both table complete and incomplete	
 	DROP  TEMPORARY TABLE if EXISTS temp_voice;
@@ -118,20 +124,20 @@ BEGIN
 
 	-- final result report of the voice data 
 	SELECT 
-	ICCID  AS 'ICCID',
-	IMSI AS 'IMSI',
-	MSISDN AS 'MSISDN',
+	temp_voice.ICCID  AS 'ICCID',
+	temp_voice.IMSI AS 'IMSI',
+	temp_voice.MSISDN AS 'MSISDN',
 	-- WHOLESALE_PLAN_ID AS 'ACCOUNT ID',
 	COUNTRY_CODE AS 'ACCOUNT ID',
-	MNO_ACCOUNTID AS 'ACCOUNT ID',
+	-- MNO_ACCOUNTID AS 'ACCOUNT ID',
 	-- concat(@temp_date ,' - ',date_duration) AS 'BILLING CYCLE DATE',
 	'5' AS 'BILLING CYCLE DATE',
 	CALLINGNUMBER AS 'CALLING PARTY NUMBER',
 	CALLEDNUMBER AS 'CALLED',
 	CALLDURATION AS 'ANSWER DURATION',
-	CAST(CALLDURATION/60 AS INT)*60+60 as 'ANSWER DURATION ROUNDED',
+	case when CALLDURATION=0  then CALLDURATION else CAST(CALLDURATION/60 AS INT)*60 end as 'ANSWER DURATION ROUNDED',
 	ANMRECDAT AS 'ORIGINATION DATE',
-	(MCC+MNC) AS 'OPERATOR NETWORK',
+	concat(MCC,case when CHAR_LENGTH(MNC)=1 then  concat('0',MNC) else MNC end ) AS 'OPERATOR NETWORK',
 	-- CAUSEINDCAUSEVALUE AS 'CALL TERMINATION REASON',
 	case when MOCALL=0 and (CALLDURATION is null or CALLDURATION =0) 
 			then 
@@ -158,9 +164,19 @@ BEGIN
 			end
 	end AS 'CALL TERMINATION REASON',
 	'Circuit Switched' as 'CALL TYPE',
-	case when MOCALL=1 then 'MO' ELSE 'MT' end 'CALL DIRECTION'
+	case when MOCALL=1 then 'MO' ELSE 'MT' end 'CALL DIRECTION',
+	temp_wholesale_plan_history.plan AS PLAN,
+	cdr_voice_tadig_codes.TC_TADIG_CODE as TAP_CODE
 	FROM temp_voice
-	GROUP BY IMSI,'ANSWER DURATION','ORIGINATION DATE';
+	left join temp_wholesale_plan_history on temp_wholesale_plan_history.IMSI=temp_voice.IMSI
+	and (ANMRECDAT between  temp_wholesale_plan_history.start_date and temp_wholesale_plan_history.end_date)
+	left join cdr_voice_tadig_codes on temp_voice.MCC=cdr_voice_tadig_codes.TC_MCC
+	and case when CHAR_LENGTH(temp_voice.MNC)=1 then  concat('0',temp_voice.MNC) else temp_voice.MNC end = cdr_voice_tadig_codes.TC_MNC ;
+-- 	GROUP BY IMSI,'ANSWER DURATION','ORIGINATION DATE';
+	
+
+
+
 
 END//
 DELIMITER ;
