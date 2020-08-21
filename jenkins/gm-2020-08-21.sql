@@ -201,11 +201,6 @@ CREATE TABLE `vw_network_registration_failure_level` (
   `level_alias_4` VARCHAR(50) NULL COLLATE 'utf8_general_ci'
 ) ENGINE=MyISAM;
 
--- Dumping structure for view gm_reports.vw_network_registration_failure_level
-DROP VIEW IF EXISTS `vw_network_registration_failure_level`;
--- Removing temporary table and create final VIEW structure
-DROP TABLE IF EXISTS `vw_network_registration_failure_level`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vw_network_registration_failure_level` AS select `fl1`.`level_name` AS `level_1`,`fl1`.`level_alias` AS `level_alias_1`,`fl2`.`level_name` AS `level_2`,`fl2`.`level_alias` AS `level_alias_2`,`fl3`.`level_name` AS `level_3`,`fl3`.`level_alias` AS `level_alias_3`,`fl4`.`level_name` AS `level_4`,`fl4`.`level_alias` AS `level_alias_4` from (((`network_registration_failure_level_1` `fl1` join `network_registration_failure_level_2` `fl2` on((`fl1`.`id` = `fl2`.`level_one_id`))) join `network_registration_failure_level_3` `fl3` on((`fl2`.`id` = `fl3`.`level_two_id`))) join `network_registration_failure_level_4` `fl4` on((`fl3`.`id` = `fl4`.`level_three_id`)));
 
 INSERT INTO `report_data_details` (`ID`, `DATA_NODE`, `REPORT_NODE`, `DATA_PROCESSING_DATE`, `IS_PROCESSED`) VALUES ('9', 'retail_revenue_share', 'retail_revenue_share', '2020-05-28 06:35:56', '1');
 INSERT INTO `report_data_details` (`ID`, `DATA_NODE`, `REPORT_NODE`, `DATA_PROCESSING_DATE`, `IS_PROCESSED`) VALUES ('11', 'registration_failure', 'network', '2020-07-14 09:57:10', '1');
@@ -218,6 +213,12 @@ INSERT INTO `reports` (`ID`, `NAME`, `INTERVAL_VALUE`, `INTERVAL_UNIT`, `REMARKS
 
 INSERT INTO `report_mapping` (`REPORT_ID`, `NODE_ID`) VALUES (8,11);
 INSERT INTO `report_mapping` (`REPORT_ID`, `NODE_ID`) VALUES (7,9);
+
+-- Dumping structure for view gm_reports.vw_network_registration_failure_level
+DROP VIEW IF EXISTS `vw_network_registration_failure_level`;
+-- Removing temporary table and create final VIEW structure
+DROP TABLE IF EXISTS `vw_network_registration_failure_level`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vw_network_registration_failure_level` AS select `fl1`.`level_name` AS `level_1`,`fl1`.`level_alias` AS `level_alias_1`,`fl2`.`level_name` AS `level_2`,`fl2`.`level_alias` AS `level_alias_2`,`fl3`.`level_name` AS `level_3`,`fl3`.`level_alias` AS `level_alias_3`,`fl4`.`level_name` AS `level_4`,`fl4`.`level_alias` AS `level_alias_4` from (((`network_registration_failure_level_1` `fl1` join `network_registration_failure_level_2` `fl2` on((`fl1`.`id` = `fl2`.`level_one_id`))) join `network_registration_failure_level_3` `fl3` on((`fl2`.`id` = `fl3`.`level_two_id`))) join `network_registration_failure_level_4` `fl4` on((`fl3`.`id` = `fl4`.`level_three_id`)));
 
 
 
