@@ -8,7 +8,24 @@
 USE `gm_reports`;
 
 
-ALTER TABLE plan ADD COLUMN plan_name VARCHAR(256);
+
+-- Dumping structure for table gm_reports.plan
+DROP TABLE IF EXISTS `plan`;
+CREATE TABLE IF NOT EXISTS `plan` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Auto incremented id',
+  `gm_plan_id` varchar(256) DEFAULT NULL COMMENT 'plan id of gm',
+  `bss_plan_id` varchar(256) DEFAULT NULL COMMENT 'plan id of bss',
+  `plan_name` varchar(256) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB COMMENT='This table is used to store plan details of bss and gm.';
+
+-- Dumping data for table gm_reports.plan: ~2 rows (approximately)
+DELETE FROM `plan`;
+/*!40000 ALTER TABLE `plan` DISABLE KEYS */;
+INSERT INTO `plan` (`id`, `gm_plan_id`, `bss_plan_id`, `plan_name`) VALUES
+  (1, '1', '130', 'Daimler Test'),
+  (2, '2', '131', 'Plan 2');
+
 
 -- Dumping structure for procedure gm_reports.gm_mobile_network_registration_failure_daily_report
 DROP PROCEDURE IF EXISTS `gm_mobile_network_registration_failure_daily_report`;
@@ -189,17 +206,9 @@ CREATE TABLE IF NOT EXISTS `retail_revenue_share` (
 
 -- Dumping structure for view gm_reports.vw_network_registration_failure_level
 DROP VIEW IF EXISTS `vw_network_registration_failure_level`;
--- Creating temporary table to overcome VIEW dependency errors
-CREATE TABLE `vw_network_registration_failure_level` (
-  `level_1` VARCHAR(50) NULL COLLATE 'utf8_general_ci',
-  `level_alias_1` VARCHAR(50) NULL COLLATE 'utf8_general_ci',
-  `level_2` VARCHAR(50) NULL COLLATE 'utf8_general_ci',
-  `level_alias_2` VARCHAR(50) NULL COLLATE 'utf8_general_ci',
-  `level_3` VARCHAR(50) NULL COLLATE 'utf8_general_ci',
-  `level_alias_3` VARCHAR(50) NULL COLLATE 'utf8_general_ci',
-  `level_4` VARCHAR(50) NULL COLLATE 'utf8_general_ci',
-  `level_alias_4` VARCHAR(50) NULL COLLATE 'utf8_general_ci'
-) ENGINE=MyISAM;
+-- Removing temporary table and create final VIEW structure
+DROP TABLE IF EXISTS `vw_network_registration_failure_level`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vw_network_registration_failure_level` AS select `fl1`.`level_name` AS `level_1`,`fl1`.`level_alias` AS `level_alias_1`,`fl2`.`level_name` AS `level_2`,`fl2`.`level_alias` AS `level_alias_2`,`fl3`.`level_name` AS `level_3`,`fl3`.`level_alias` AS `level_alias_3`,`fl4`.`level_name` AS `level_4`,`fl4`.`level_alias` AS `level_alias_4` from (((`network_registration_failure_level_1` `fl1` join `network_registration_failure_level_2` `fl2` on((`fl1`.`id` = `fl2`.`level_one_id`))) join `network_registration_failure_level_3` `fl3` on((`fl2`.`id` = `fl3`.`level_two_id`))) join `network_registration_failure_level_4` `fl4` on((`fl3`.`id` = `fl4`.`level_three_id`)));
 
 
 INSERT INTO `report_data_details` (`ID`, `DATA_NODE`, `REPORT_NODE`, `DATA_PROCESSING_DATE`, `IS_PROCESSED`) VALUES ('9', 'retail_revenue_share', 'retail_revenue_share', '2020-05-28 06:35:56', '1');
@@ -214,11 +223,6 @@ INSERT INTO `reports` (`ID`, `NAME`, `INTERVAL_VALUE`, `INTERVAL_UNIT`, `REMARKS
 INSERT INTO `report_mapping` (`REPORT_ID`, `NODE_ID`) VALUES (8,11);
 INSERT INTO `report_mapping` (`REPORT_ID`, `NODE_ID`) VALUES (7,9);
 
--- Dumping structure for view gm_reports.vw_network_registration_failure_level
-DROP VIEW IF EXISTS `vw_network_registration_failure_level`;
--- Removing temporary table and create final VIEW structure
-DROP TABLE IF EXISTS `vw_network_registration_failure_level`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vw_network_registration_failure_level` AS select `fl1`.`level_name` AS `level_1`,`fl1`.`level_alias` AS `level_alias_1`,`fl2`.`level_name` AS `level_2`,`fl2`.`level_alias` AS `level_alias_2`,`fl3`.`level_name` AS `level_3`,`fl3`.`level_alias` AS `level_alias_3`,`fl4`.`level_name` AS `level_4`,`fl4`.`level_alias` AS `level_alias_4` from (((`network_registration_failure_level_1` `fl1` join `network_registration_failure_level_2` `fl2` on((`fl1`.`id` = `fl2`.`level_one_id`))) join `network_registration_failure_level_3` `fl3` on((`fl2`.`id` = `fl3`.`level_two_id`))) join `network_registration_failure_level_4` `fl4` on((`fl3`.`id` = `fl4`.`level_three_id`)));
 
 
 
