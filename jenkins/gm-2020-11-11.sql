@@ -230,7 +230,7 @@ BEGIN
     CASE WHEN BOOTSTRAP_ICCID ='null' THEN NULL ELSE BOOTSTRAP_ICCID END AS BOOTSTRAP_ICCID
     FROM report_metadata
    left join gm_country_code_mapping on report_metadata.ACCOUNT_COUNTRIE=gm_country_code_mapping.account
-   where report_metadata.MNO_ACCOUNTID=in_account_id;
+   where report_metadata.ENT_ACCOUNTID=in_account_id;
    
    -- applying the check of mandatory column
    DROP TABLE IF EXISTS temp_mobile_reconciliation_data_return_table_new;
