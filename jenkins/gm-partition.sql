@@ -1,4 +1,4 @@
-USE gm_reports;
+USE gm_reports_demo;
 
 -- creation of backup table
 DROP TABLE IF EXISTS cdr_data_details_vw_backup;
