@@ -39,7 +39,7 @@ BEGIN
    SET start_date:= CAST(in_start_date AS DATEtime);
   
   
-  SET @TEMP_BILLING_CYCLE_DATE = (SELECT YEAR(in_start_date)+MONTH(in_start_date)-2020);
+  SET @TEMP_BILLING_CYCLE_DATE = (SELECT YEAR(in_start_date)+MONTH(in_start_date)-YEAR(NOW()));
 
   
     SET date_duration= LAST_DAY(CONVERT( in_start_date, DATE ));
