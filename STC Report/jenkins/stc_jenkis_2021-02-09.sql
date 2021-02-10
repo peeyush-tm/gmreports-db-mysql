@@ -11,7 +11,7 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Dumping structure for procedure gm_reports.gm_voice_report
+-- Dumping structure for procedure stc_report.gm_voice_report
 DROP PROCEDURE IF EXISTS `gm_voice_report`;
 DELIMITER //
 CREATE PROCEDURE `gm_voice_report`(
@@ -66,14 +66,15 @@ BEGIN
   cdr_voice_incompleted.MOCALL,
   cdr_voice_incompleted.LASTERBCSM,
   gm_country_code_mapping.country_Code AS COUNTRY_CODE,
-  report_metadata.WHOLE_SALE_NAME
+  report_metadata.WHOLE_SALE_NAME,
+  report_metadata.ACCOUNT_NOTES AS ACCOUNT_NOTES,
+    cdr_voice_incompleted.CIC AS cic
   FROM cdr_voice_incompleted 
   INNER JOIN report_metadata 
   ON (report_metadata.MSISDN = cdr_voice_incompleted.CALLEDNUMBER
   or report_metadata.MSISDN = cdr_voice_incompleted.CALLINGNUMBER)
   left join gm_country_code_mapping on report_metadata.ACCOUNT_COUNTRIE=gm_country_code_mapping.account
-  WHERE date(cdr_voice_incompleted.ANMRECDAT) = start_date
-  and report_metadata.ENT_ACCOUNTID=in_account_id;
+  WHERE date(cdr_voice_incompleted.ANMRECDAT) = start_date;
       
   
   DROP  TEMPORARY TABLE if EXISTS temp_voice_complete;
@@ -94,14 +95,15 @@ BEGIN
   cdr_voice_completed.MOCALL,
   cdr_voice_completed.LASTERBCSM,
   gm_country_code_mapping.country_Code AS COUNTRY_CODE,
-  report_metadata.WHOLE_SALE_NAME
+  report_metadata.WHOLE_SALE_NAME,
+  report_metadata.ACCOUNT_NOTES AS ACCOUNT_NOTES,
+  cdr_voice_completed.CIC AS cic
   FROM cdr_voice_completed 
   INNER JOIN report_metadata 
   ON (report_metadata.MSISDN = cdr_voice_completed.CALLEDNUMBER
     or report_metadata.MSISDN = cdr_voice_completed.CALLINGNUMBER)
   left join gm_country_code_mapping on report_metadata.ACCOUNT_COUNTRIE=gm_country_code_mapping.account
-  WHERE date(cdr_voice_completed.ANMRECDAT) = start_date
-  and report_metadata.ENT_ACCOUNTID=in_account_id;
+  WHERE date(cdr_voice_completed.ANMRECDAT) = start_date;
   
 
     
@@ -154,7 +156,8 @@ BEGIN
   temp_voice.IMSI AS 'IMSI',
   temp_voice.MSISDN AS 'MSISDN',
   
-  COUNTRY_CODE AS 'ACCOUNT ID',
+  -- COUNTRY_CODE AS 'ACCOUNT ID',
+  ACCOUNT_NOTES AS CONTRACT_ID,
   
   @TEMP_BILLING_CYCLE_DATE AS 'BILLING CYCLE DATE',
     
@@ -172,7 +175,7 @@ BEGIN
        when MOCALL=1 
       then COALESCE(LASTERBCSM,0)
   end AS 'CALL TERMINATION REASON',
-   case when cic= '1' then '2' ELSE '1' end as 'CALL TYPE',
+  case when cic= '1' then '2' ELSE '1' end as 'CALL TYPE',
   case when MOCALL=1 then 'MO' ELSE 'MT' end 'CALL DIRECTION',
  case when temp_wholesale_plan_history.IMSI=temp_voice.IMSI then  temp_wholesale_plan_history.plan ELSE temp_voice.WHOLE_SALE_NAME END AS PLAN,
  -- temp_wholesale_plan_history.plan AS PLAN,
@@ -185,7 +188,7 @@ BEGIN
 
   
    
-  SELECT temp_voice_data_return_table.*,CASE WHEN ICCID IS NULL OR IMSI IS NULL OR MSISDN IS NULL OR `ACCOUNT ID` IS NULL OR `BILLING CYCLE DATE` IS NULL
+  SELECT temp_voice_data_return_table.*,CASE WHEN ICCID IS NULL OR IMSI IS NULL OR MSISDN IS NULL OR `CONTRACT_ID` IS NULL OR `BILLING CYCLE DATE` IS NULL
     OR `CALLING PARTY NUMBER` IS NULL OR `CALLED` IS NULL OR `ANSWER DURATION` IS NULL OR `ANSWER DURATION ROUNDED` IS NULL 
         OR `ORIGINATION DATE` IS NULL OR `OPERATOR NETWORK` IS NULL OR `CALL TERMINATION REASON` IS NULL OR `CALL TYPE` IS NULL
     OR `CALL DIRECTION` IS NULL OR PLAN IS NULL OR TAP_CODE IS NULL
@@ -198,6 +201,9 @@ BEGIN
 
 END//
 DELIMITER ;
+
+ALTER TABLE `cdr_voice_incompleted` ADD COLUMN `CIC` VARCHAR(50) NULL DEFAULT NULL AFTER `LASTERBCSM`;
+ALTER TABLE `cdr_voice_completed` ADD COLUMN `CIC` VARCHAR(50) NULL DEFAULT NULL AFTER `LASTERBCSM`;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
