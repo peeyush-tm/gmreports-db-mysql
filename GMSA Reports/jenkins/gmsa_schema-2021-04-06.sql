@@ -1,4 +1,3 @@
-
 -- Dumping structure for procedure gmsa_reports.gm_data_report_v1
 DROP PROCEDURE IF EXISTS `gm_data_report_v1`;
 DELIMITER //
@@ -65,7 +64,8 @@ BEGIN
   report_metadata.ICCID AS ICCID,
   report_metadata.MSISDN AS MSISDN,
   report_metadata.IMSI AS IMSI,
-  LEFT(report_metadata.MSISDN,6) AS OPERATOR_NETWORK,
+  -- LEFT(report_metadata.MSISDN,6) AS OPERATOR_NETWORK,
+  concat(case when CHAR_LENGTH(ULI_MCC)=1 then  CONCAT('00',ULI_MCC) when CHAR_LENGTH(ULI_MCC)=2 then  concat('0',ULI_MCC) ELSE ULI_MCC END,case when CHAR_LENGTH(ULI_MNC)=1 then  CONCAT('00',ULI_MNC) when CHAR_LENGTH(ULI_MNC)=2 then  concat('0',ULI_MNC) ELSE ULI_MNC END) AS OPERATOR_NETWORK,
    cdr_data_details_vw.START_TIME AS ORIGINATION_DATE,
    sum(cdr_data_details_vw.UPLINK_BYTES) AS TRANSMIT_BYTE,
    sum(cdr_data_details_vw.DOWNLINK_BYTES) AS RECEIVE_BYTES,
@@ -283,18 +283,4 @@ BEGIN
 END//
 DELIMITER ;
 
-TRUNCATE table gm_country_code_mapping;
 
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('Airlinq', 1);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('ESIM', 2);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('Brazil', 3);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('Boot Strap', 4);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('SSA', 5);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('Argentina', 6);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('Chile', 7);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('Brazil-production', 8);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('Columbia', 9);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('Ecuador', 10);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('Paraguay', 11);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('Peru', 12);
-INSERT INTO `gm_country_code_mapping` (`account`, `country_Code`) VALUES ('Uruguay', 13);
